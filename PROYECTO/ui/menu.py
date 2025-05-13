@@ -1,84 +1,112 @@
-# ui/menu.py
-
-from app import (
-    GestionPrestamos,
-    GestionAlumnos,
-    GestionLibros,
-    GestionMaterias,
-    GestionCursos
-)
+from PROYECTO.app import GestionCsv
+from PROYECTO.config.config import configuraciones, credenciales
 
 class Menu:
     def __init__(self):
         self.gestores = {
-            "1": GestionPrestamos(),
-            "2": GestionAlumnos(),
-            "3": GestionLibros(),
-            "4": GestionMaterias(),
-            "5": GestionCursos()
+            "1": ("alumnos", GestionCsv(**configuraciones["alumnos"])),
+            "2": ("libros", GestionCsv(**configuraciones["libros"])),
+            "3": ("materias", GestionCsv(**configuraciones["materias"])),
+            "4": ("cursos", GestionCsv(**configuraciones["cursos"])),
+            "5": ("prestamos", GestionCsv(**configuraciones["prestamos"])),
         }
 
-        self.nombres = {
-            "1": "préstamos",
-            "2": "alumnos",
-            "3": "libros",
-            "4": "materias",
-            "5": "cursos"
-        }
+    def login(self):
+        print("=== LOGIN ===")
+        for _ in range(3):
+            usuario = input("Usuario: ")
+            contraseña = input("Contraseña: ")
+            if usuario == credenciales["usuario"] and contraseña == credenciales["contraseña"]:
+                print("Acceso concedido.\n")
+                return True
+            else:
+                print("Usuario o contraseña incorrectos.\n")
+        print("Demasiados intentos fallidos. Saliendo...")
+        return False
 
-    def iniciar_sesion(self):
-        usuario = input("Usuario: ")
-        contraseña = input("Contraseña: ")
-        if usuario == "administrador" and contraseña == "1234":
-            print("Inicio de sesión exitoso.")
-            return True
-        else:
-            print("Usuario o contraseña incorrectos.")
-            return False
-
-    def mostrar_menu(self):
-        if not self.iniciar_sesion():
+    def iniciar(self):
+        if not self.login():
             return
-
         while True:
-            print("\nSistema de Gestión")
-            print("1. Gestionar préstamos")
-            print("2. Gestionar alumnos")
-            print("3. Gestionar libros")
-            print("4. Gestionar materias")
-            print("5. Gestionar cursos")
-            print("0. Salir")
+            self.mostrar_menu_principal()
             opcion = input("Elige una opción: ")
-
-            if opcion == "0":
+            if opcion in self.gestores:
+                nombre, gestor = self.gestores[opcion]
+                self.menu_gestion(nombre, gestor)
+            elif opcion == "0":
+                print("¡Hasta luego!")
                 break
-            elif opcion in self.gestores:
-                self.menu_gestion(opcion)
             else:
                 print("Opción no válida.")
 
-    def menu_gestion(self, opcion):
-        gestor = self.gestores[opcion]
-        nombre = self.nombres[opcion].capitalize()
+    def mostrar_menu_principal(self):
+        print("\n--- MENÚ PRINCIPAL ---")
+        print("1. Gestionar alumnos")
+        print("2. Gestionar libros")
+        print("3. Gestionar materias")
+        print("4. Gestionar cursos")
+        print("5. Gestionar préstamos")
+        print("0. Salir")
 
+    def menu_gestion(self, nombre, gestor):
         while True:
-            print(f"\nGestión de {nombre}")
+            print(f"\n--- Gestión de {nombre} ---")
             print("1. Listar")
             print("2. Añadir")
             print("3. Modificar")
             print("4. Eliminar")
             print("0. Volver")
-            subop = input("Elige una opción: ")
-
-            if subop == "1":
-                gestor.listar()
-            elif subop == "2":
-                gestor.añadir()
-            elif subop == "3":
-                gestor.modificar()
-            elif subop == "4":
-                gestor.eliminar()
-            elif subop == "0":
+            opcion = input("Elige una opción: ")
+            if opcion == "1":
+                registros = gestor.listar()
+                if registros:
+                    for fila in registros:
+                        print(fila)
+                else:
+                    print("No hay registros.")
+            elif opcion == "2":
+                self._añadir_registro(gestor)
+            elif opcion == "3":
+                self._modificar_registro(gestor)
+            elif opcion == "4":
+                self._eliminar_registro(gestor)
+            elif opcion == "0":
                 break
             else:
                 print("Opción no válida.")
+
+    def _añadir_registro(self, gestor):
+        try:
+            datos = {}
+            for campo in gestor.campos:
+                datos[campo] = input(f"{campo}: ").strip()
+            if gestor.añadir(datos):
+                print("Añadido correctamente")
+            else:
+                print("Error al añadir")
+        except ValueError as e:
+            print(f"Error de validación: {str(e)}")
+
+    def _modificar_registro(self, gestor):
+        try:
+            clave = input("Campo clave para buscar: ").strip()
+            valor = input(f"Valor de {clave}: ").strip()
+            nuevos_datos = {}
+            for campo in gestor.campos:
+                nuevo = input(f"Nuevo {campo} (vacío=no cambiar): ").strip()
+                if nuevo:
+                    nuevos_datos[campo] = nuevo
+            if gestor.modificar(clave, valor, nuevos_datos):
+                print("Modificado correctamente")
+            else:
+                print("No se encontró el registro")
+        except ValueError as e:
+            print(f"Error de validación: {str(e)}")
+
+    def _eliminar_registro(self, gestor):
+        clave = input("Campo clave para buscar (ej. 'nie' o 'isbn'): ").strip()
+        valor = input(f"Valor de {clave}: ").strip()
+        if gestor.eliminar(clave, valor):
+            print("Eliminado correctamente.")
+        else:
+            print("No se encontró el registro.")
