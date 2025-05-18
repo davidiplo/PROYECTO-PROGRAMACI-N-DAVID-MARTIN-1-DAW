@@ -1,4 +1,5 @@
 from PROYECTO.app import GestionCsv
+from PROYECTO.exportacion import exportar_alumnos_formato_delphos
 from PROYECTO.config.config import configuraciones, credenciales
 
 class Menu:
@@ -36,6 +37,8 @@ class Menu:
             elif opcion == "0":
                 print("¡Hasta luego!")
                 break
+            elif opcion == "6":
+                exportar_alumnos_formato_delphos()
             else:
                 print("Opción no válida.")
 
@@ -46,6 +49,7 @@ class Menu:
         print("3. Gestionar materias")
         print("4. Gestionar cursos")
         print("5. Gestionar préstamos")
+        print("6. Exportar alumnos a formato Delphos")
         print("0. Salir")
 
     def menu_gestion(self, nombre, gestor):
@@ -110,3 +114,5 @@ class Menu:
             print("Eliminado correctamente.")
         else:
             print("No se encontró el registro.")
+
+

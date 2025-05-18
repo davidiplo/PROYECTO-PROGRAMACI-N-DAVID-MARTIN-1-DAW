@@ -133,3 +133,5 @@ class GestionCsv:
         suma = sum((i + 1) * int(d) for i, d in enumerate(isbn[:9]))
         suma += 10 * (10 if isbn[-1] == 'X' else int(isbn[-1]))
         return suma % 11 == 0
+
+
