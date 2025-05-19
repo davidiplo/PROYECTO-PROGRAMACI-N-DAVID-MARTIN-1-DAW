@@ -1,5 +1,5 @@
 import csv
-from config.config import configuraciones
+from PROYECTO.config.config import configuraciones
 
 def exportar_alumnos_formato_delphos():
     archivo_origen = configuraciones["alumnos"]["archivo"]
