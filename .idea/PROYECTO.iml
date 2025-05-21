@@ -5,5 +5,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="borrador" />
+    <orderEntry type="module" module-name="PROYECTO_DAVID_MARTIN" />
   </component>
 </module>

@@ -32,7 +32,6 @@ def exportar_alumnos_formato_delphos():
                 "TipoBecaLibros": f"Renta {a.get('tramo', '0')}",
                 "TipoBecaComedor": f"Tramo {a.get('tramo', '0')}",
             }
-            # Rellenar los 8 campos no necesarios
             for i in range(8):
                 fila[f"CampoNoNecesario"] = ""
             writer.writerow(fila)

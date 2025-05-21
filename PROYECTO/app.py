@@ -116,12 +116,15 @@ class GestionCsv:
     @staticmethod
     def validar_nie(nie):
         nie = nie.upper().strip()
-        if not re.match(r'^[XYZ]\d{7}[A-Z0-9]$', nie):
-            return False
-        letras = {'X': '0', 'Y': '1', 'Z': '2'}
-        nie_num = letras[nie[0]] + nie[1:8]
-        letras_control = 'TRWAGMYFPDXBNJZSQVHLCKE'
-        return nie[-1] == letras_control[int(nie_num) % 23]
+        if re.match(r'^\d{8}[A-Z]$', nie):
+            letras_control = 'TRWAGMYFPDXBNJZSQVHLCKE'
+            return nie[-1] == letras_control[int(nie[:8]) % 23]
+        elif re.match(r'^[XYZ]\d{7}[A-Z]$', nie):
+            letras = {'X': '0', 'Y': '1', 'Z': '2'}
+            nie_num = letras[nie[0]] + nie[1:8]
+            letras_control = 'TRWAGMYFPDXBNJZSQVHLCKE'
+            return nie[-1] == letras_control[int(nie_num) % 23]
+        return False
 
     @staticmethod
     def validar_isbn10(isbn):
